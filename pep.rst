@@ -161,7 +161,7 @@ Python programmers already use for similar purposes in other contexts.
 Rationale
 ---------
 
-**Why use the `*` and `**` syntax?** This proposal builds on an
+**Why use the * and ** syntax?** This proposal builds on an
 existing, well-understood concept: the unpacking operator. In Python,
 ``*iterable`` is widely recognized as the way to "flatten" an iterable
 into another iterable context (such as in function calls or literal

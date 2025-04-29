@@ -406,7 +406,7 @@ Alternatives
 Throughout the discussion of this feature, several alternative
 approaches and ideas have been considered:
 
--  **Status quo (nested comprehensions or ``itertools.chain``)**: The
+-  **Status quo (nested comprehensions or itertools.chain)**: The
    primary alternative is to continue using the techniques that
    developers use today – either double-loop comprehensions or
    ``chain.from_iterable`` (or writing manual loops). These approaches

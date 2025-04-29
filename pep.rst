@@ -169,10 +169,7 @@ displays), and ``**mapping`` is used to merge mappings. Applying the
 same operators in comprehension output expressions is a consistent
 extension of this concept (`Unpacking in
 tuple/list/set/dict comprehensions - Python-ideas -
-python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=Extended%20unpacking%20notation%20%28,set%20with>`__)
-(`Unpacking in tuple/list/set/dict
-comprehensions - Python-ideas -
-python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=propose%20,attempt%20to%20argue%20that%20the>`__).
+python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=Extended%20unpacking%20notation%20%28,set%20with>`__).
 A comprehension with ``*expr`` for a sequence effectively means “extend
 the result with the items from ``expr`` on each iteration," which
 parallels how ``[*a, *b]`` extends a list with items from ``a`` and

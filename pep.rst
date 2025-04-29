@@ -3,10 +3,10 @@ PEP 9999: Allowing Iterable Unpacking in Comprehensions
 
 | **PEP**: 9999 (draft)
 | **Title**: Allowing Iterable Unpacking in Comprehensions
-| **Author**: Alex Prengère alex.prengere@example.com
+| **Author**: Alex Prengère alex.prengere@gmail.com
 | **Status**: Draft
 | **Type**: Standards Track
-| **Python-Version**: 3.14
+| **Python-Version**: 3.15
 | **Created**: 29-Apr-2025
 | **Discussions-To**: `Discuss Python Ideas – Topic
   35291 <https://discuss.python.org/t/using-unpacking-to-generalize-comprehensions-with-multiple-elements/35291>`__
@@ -14,15 +14,16 @@ PEP 9999: Allowing Iterable Unpacking in Comprehensions
 Abstract
 --------
 
-This PEP proposes extending Python’s comprehension syntax to allow the
+This PEP proposes extending Python's comprehension syntax to allow the
 use of iterable unpacking (``*`` and ``**`` operators) inside list, set,
-and dictionary comprehensions. This change would enable a comprehension
-to yield multiple elements per iteration (flattening an iterable of
-iterables) or merge multiple mappings in a dict comprehension. The
-proposed syntax is a natural extension of the unpacking generalizations
-introduced in PEP 448, applied to comprehensions. The goal is to provide
-a more concise and readable way to flatten sequences or combine mappings
-in a comprehension, without needing nested loops or external functions.
+and dictionary comprehensions, as well as generator expressions.
+This change would enable a comprehension to yield multiple elements per
+iteration (flattening an iterable of iterables) or merge multiple mappings
+in a dict comprehension. The proposed syntax is a natural extension of the
+unpacking generalizations introduced in PEP 448, applied to comprehensions.
+The goal is to provide a more concise and readable way to flatten sequences
+or combine mappings in a comprehension, without needing nested loops or
+external functions.
 
 Motivation
 ----------
@@ -34,6 +35,11 @@ clarity and brevity. For example, given a list of ``Flight`` objects,
 one can collect all departure airports with a list comprehension:
 
 .. code:: python
+
+   # Before refactoring
+   points = []
+   for f in flights:
+       points.append(f.departure)
 
    # Using a simple list comprehension for a single attribute
    points = [f.departure for f in flights]
@@ -57,24 +63,20 @@ comprehension. Today, the most straightforward comprehension equivalent
 is not obvious — one must either use an additional nested loop or an
 external helper:
 
--  **Using a nested comprehension with two ``for`` clauses** (one for
+-  **Using a nested comprehension with two for clauses** (one for
    flights, one for points in each flight tuple):
 
    .. code:: python
 
-      points = [leg for f in flights for leg in (f.departure, f.arrival)]
+      points = [point for f in flights for point in (f.departure, f.arrival)]
 
    This produces the desired flattened list, but it is somewhat
    unintuitive. The syntax of multiple ``for`` clauses is less
    immediately clear to readers (it essentially double-loops and
-   flattens, but many find it hard to parse at a glance (`Using
-   unpacking to generalize comprehensions with multiple elements - Ideas
-   - Discussions on
-   Python.org <https://discuss.python.org/t/using-unpacking-to-generalize-comprehensions-with-multiple-elements/35291#:~:text=This%20is%20however%20a%20pretty,expansion%20are%20obvious%E2%80%A6>`__)).
-   It also requires creating a tuple ``(f.departure, f.arrival)`` for
-   each flight and an extra loop to unpack it.
+   flattens), and also requires creating a tuple ``(f.departure, f.arrival)``
+   for each flight and an extra loop to unpack it.
 
--  **Using ``itertools.chain.from_iterable``**:
+-  **Using itertools.chain.from_iterable**:
 
    .. code:: python
 
@@ -89,8 +91,8 @@ external helper:
 Both approaches achieve the result, but neither is as clear or concise
 as a list comprehension typically aspires to be. The
 comprehension-with-nested-loop syntax, in particular, is often
-considered tricky for newcomers and can be mistaken for a different
-semantic. Many Python users might even **expect** the unpacking operator
+considered tricky for newcomers (one needs to remember the order of the nested loop).
+Many Python users might even **expect** the unpacking operator
 to work inside a comprehension, given that it works in other
 iterable-building contexts. For instance, since Python 3.5 we can write:
 
@@ -111,10 +113,10 @@ iteration. Indeed, one might try to write a comprehension as follows:
    # Hypothetical syntax (currently a SyntaxError)
    points = [*(f.departure, f.arrival) for f in flights]
 
-Intuitively, this syntax suggests: “for each flight, unpack the tuple
-``(f.departure, f.arrival)`` into the resulting list.” Currently, this
+Intuitively, this syntax suggests: "for each flight, unpack the tuple
+``(f.departure, f.arrival)`` into the resulting list." Currently, this
 is invalid syntax in Python (it raises a ``SyntaxError`` complaining
-that “iterable unpacking cannot be used in comprehension”). This PEP’s
+that "iterable unpacking cannot be used in comprehension"). This PEP's
 motivation is to lift that restriction and allow such syntax, thereby
 making comprehensions more general and powerful. The ability to yield
 multiple items per iteration in a comprehension would directly address
@@ -165,10 +167,10 @@ existing, well-understood concept: the unpacking operator. In Python,
 into another iterable context (such as in function calls or literal
 displays), and ``**mapping`` is used to merge mappings. Applying the
 same operators in comprehension output expressions is a consistent
-extension of this concept (`Mailman 3 [Python-ideas] Unpacking in
+extension of this concept (`Unpacking in
 tuple/list/set/dict comprehensions - Python-ideas -
 python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=Extended%20unpacking%20notation%20%28,set%20with>`__)
-(`Mailman 3 [Python-ideas] Unpacking in tuple/list/set/dict
+(`Unpacking in tuple/list/set/dict
 comprehensions - Python-ideas -
 python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=propose%20,attempt%20to%20argue%20that%20the>`__).
 A comprehension with ``*expr`` for a sequence effectively means “extend
@@ -192,11 +194,11 @@ The proposed comprehension unpacking reads naturally once you know what
 ``*`` means: for example, ``[ *row for row in matrix ]`` is easily
 understood as flattening each ``row``. In fact, evidence of its
 intuitive nature can be found in user discussions – people periodically
-ask why this syntax isn’t allowed or attempt to use it, indicating that
+ask why this syntax isn't allowed or attempt to use it, indicating that
 it *feels* like a logical part of the language. Even newcomers, once
 they learn about ``*`` for unpacking, often find the double-loop
-comprehension idiom harder to grasp than the concept of a “flattening
-``*``”. Thus, the readability concern has likely diminished over time.
+comprehension idiom harder to grasp than the concept of a "flattening
+``*``". Thus, the readability concern has likely diminished over time.
 
 **Consistency with mental model:** A comprehension today can be viewed
 as syntactic sugar for a loop that appends to a list (or adds to a set,
@@ -219,7 +221,7 @@ iteration. This change is minimal and keeps a clear conceptual model:
 items*. This is analogous to how one might teach the difference between
 ``list.append(x)`` vs ``list.extend([...])`` – the comprehension is just
 doing it implicitly. Some have argued that this slightly complicates the
-comprehension model since it’s no longer a one-to-one correspondence
+comprehension model since it's no longer a one-to-one correspondence
 with a simple append (`Mailman 3 [Python-ideas] Unpacking in
 tuple/list/set/dict comprehensions - Python-ideas -
 python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=Arguments%20against%3A%20,x...%20for%20x%20in>`__).
@@ -230,7 +232,7 @@ extending vs appending.
 
 **Why now?** The idea of comprehension unpacking was explicitly
 considered and set aside when PEP 448 was implemented, largely to avoid
-delaying the rest of that PEP’s features (`PEP 448 – Additional
+delaying the rest of that PEP's features (`PEP 448 – Additional
 Unpacking Generalizations \|
 peps.python.org <https://peps.python.org/pep-0448/#variations#:~:text=>`__).
 The deferred feature was noted as something that “has not been ruled out
@@ -249,8 +251,8 @@ the comprehension form is actually **more** intuitive than the status
 quo alternatives (`Mailman 3 [Python-ideas] Unpacking in
 tuple/list/set/dict comprehensions - Python-ideas -
 python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=ideas%40python,x...%20for%20x%20in>`__).
-In terms of implementation and consistency, it’s also worth noting that
-the change is small and was even prototyped during PEP 448’s development
+In terms of implementation and consistency, it's also worth noting that
+the change is small and was even prototyped during PEP 448's development
 (the reference implementation of PEP 448 had this enabled until it was
 deliberately turned off (`PEP 448 – Additional Unpacking Generalizations
 \|
@@ -261,7 +263,7 @@ since the construct is syntactically clear.
 
 In summary, the rationale for this proposal is that it introduces a
 powerful yet simple extension to an existing syntax, aligns with
-Python’s design philosophy of readability, and solves a recurring need
+Python's design philosophy of readability, and solves a recurring need
 in a consistent way. It leverages an established operator (``*``/``**``)
 for a new but related purpose, thereby minimizing the learning curve and
 surprise for Python users.
@@ -323,7 +325,7 @@ follows:
 -  **Mixed usage:** Within a single comprehension, the syntax does not
    allow combining a starred expression with other expressions at the
    same level. For example, ``[x, *y for ...]`` is not a valid
-   comprehension syntax (and would be ambiguous). The comprehension’s
+   comprehension syntax (and would be ambiguous). The comprehension's
    output expression must be either a single (non-starred) expression
    yielding one item per iteration, or a single starred expression (or
    double-starred for dict) yielding multiple items per iteration. If
@@ -377,113 +379,11 @@ the starred expression in the grammar and to treat the comprehension
 output accordingly (calling an internal extend/merge operation rather
 than append for each iteration, conceptually).
 
-Examples
---------
-
-To illustrate the benefits of this proposal, here are side-by-side
-comparisons of code using current Python versus code using the proposed
-syntax.
-
--  **Flattening two values per iteration (from the motivating
-   example):**
-
-   Current approach using ``itertools.chain``:
-
-   .. code:: python
-
-      from itertools import chain
-      points = list(chain.from_iterable((f.departure, f.arrival) for f in flights))
-
-   Proposed approach using comprehension unpacking:
-
-   .. code:: python
-
-      points = [*(f.departure, f.arrival) for f in flights]
-
-   The proposed syntax clearly mirrors the idea of taking each flight
-   and expanding its two attributes into the result. It avoids the extra
-   import and function call, and it is more direct than the
-   chain/generator combination.
-
--  **Flattening a list of lists:**
-
-   Current approach with nested comprehension:
-
-   .. code:: python
-
-      matrix = [[1, 2, 3], [4, 5, 6]]
-      flat = [x for row in matrix for x in row]
-
-   Proposed approach:
-
-   .. code:: python
-
-      flat = [*row for row in matrix]
-
-   Both result in ``flat == [1, 2, 3, 4, 5, 6]``. The comprehension with
-   ``*row`` is shorter and aligns with the mental model of “for each
-   row, take all its elements”. The nested comprehension is correct but
-   can be harder to parse quickly, especially for those not used to
-   multiple ``for`` clauses.
-
--  **Merging a list of dicts into one dict:**
-
-   Current approach using a dict comprehension with nested loops:
-
-   .. code:: python
-
-      dicts = [{"a": 1}, {"b": 2, "c": 3}]
-      merged = {k: v for d in dicts for k, v in d.items()}
-
-   Proposed approach:
-
-   .. code:: python
-
-      merged = {**d for d in dicts}
-
-   Both yield ``{"a": 1, "b": 2, "c": 3}``. In the proposed version, the
-   ``**d`` inside the comprehension immediately conveys that each dict
-   ``d`` is being unpacked (merged) into the result. The current version
-   with ``for k,v in d.items()`` is longer and exposes the mechanism
-   (iteration over items) rather than the intent (merge dictionaries).
-   The ``**`` version directly leverages the existing knowledge that
-   ``**`` in a dict literal merges dictionaries.
-
--  **Using conditions with unpacking:**
-
-   Suppose we want to flatten only those sublists that meet a certain
-   condition (say, only sublists with length > 1):
-
-   Current approach:
-
-   .. code:: python
-
-      [x for sub in lists if len(sub) > 1 for x in sub]
-
-   Proposed approach:
-
-   .. code:: python
-
-      [*sub for sub in lists if len(sub) > 1]
-
-   The conditional filter works the same way in both cases, and the
-   comprehension remains clear – in the proposed syntax, it reads as
-   “for each sub in lists, if it has more than one element, unpack all
-   its elements into the result”.
-
-These examples demonstrate how the new syntax can simplify code. In each
-case, the version with unpacking is more declarative about the operation
-being performed (flattening or merging) and avoids boilerplate. This not
-only saves typing but also reduces the chance of errors (for instance,
-it is easy to get the order of the nested loops wrong, or to forget a
-``.items()`` when merging dicts, mistakes that are less likely with the
-direct ``*``/``**`` syntax).
-
 Backwards Compatibility
 -----------------------
 
 This change is designed to be fully backward compatible. Currently, any
-use of ``*`` or ``**`` in a comprehension’s output expression is a
+use of ``*`` or ``**`` in a comprehension's output expression is a
 syntax error, so no valid Python code will be affected by lifting the
 restriction. Code written with the new syntax will of course not run on
 older Python versions (it will produce a syntax error on Python 3.13 and
@@ -500,7 +400,7 @@ No existing APIs or semantics are altered by this proposal aside from
 the syntax. The ``SyntaxError`` message “iterable unpacking cannot be
 used in comprehension” will no longer be emitted in the situations that
 become valid. There is an extremely low risk of any code depending on
-that specific error. In summary, if code doesn’t use the new syntax, it
+that specific error. In summary, if code doesn't use the new syntax, it
 behaves exactly as before.
 
 Alternatives
@@ -515,7 +415,7 @@ approaches and ideas have been considered:
    ``chain.from_iterable`` (or writing manual loops). These approaches
    have the disadvantage of being less clear in intent. The nested
    comprehension syntax, while functional, can confuse readers who are
-   not used to it, and it doesn’t scale well to more complex situations
+   not used to it, and it doesn't scale well to more complex situations
    (adding conditionals or additional loops can make it quite hard to
    read). The ``chain.from_iterable`` approach introduces a dependency
    on an external utility and a layer of indirection around a generator
@@ -528,14 +428,14 @@ approaches and ideas have been considered:
    example, a ``list.flatten()`` method or a builtin
    ``flatten(iterable_of_iterables)``). While such a helper could be
    useful, it addresses a narrower need (flattening entire iterables)
-   and doesn’t generalize to partial comprehension patterns or to dict
-   merging. It also doesn’t integrate as seamlessly into comprehension
+   and doesn't generalize to partial comprehension patterns or to dict
+   merging. It also doesn't integrate as seamlessly into comprehension
    syntax where additional filters or transformations might be present.
    Using ``*`` in comprehensions, by contrast, works naturally with
    filters (``if`` clauses) and with additional loops if needed (one
    could combine multiple levels of comprehension and still use a
    starred expression at the end). Moreover, the ``*`` operator approach
-   is more in line with Python’s philosophy of composing small concepts;
+   is more in line with Python's philosophy of composing small concepts;
    it reuses existing syntax rather than adding a new function.
 
 -  **Allowing multiple items yield via a different syntax**: One could

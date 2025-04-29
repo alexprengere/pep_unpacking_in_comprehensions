@@ -101,7 +101,7 @@ iterable-building contexts. For instance, since Python 3.5 we can write:
    a = [1, 2, 3]
    b = [4, 5, 6]
    combined_list = [*a, *b]      # yields [1, 2, 3, 4, 5, 6]
-   combined_set  = {*a, *b}      # yields {1, 2, 3, 4, 5, 6}
+   combined_set = {*a, *b}      # yields {1, 2, 3, 4, 5, 6}
 
 The ``*`` operator here *flattens* or unpacks two iterables into a new
 list or set literal. It is natural to expect that a similar construct
@@ -110,7 +110,7 @@ iteration. Indeed, one might try to write a comprehension as follows:
 
 .. code:: python
 
-   # Hypothetical syntax (currently a SyntaxError)
+   # Proposed syntax (currently a SyntaxError)
    points = [*(f.departure, f.arrival) for f in flights]
 
 Intuitively, this syntax suggests: "for each flight, unpack the tuple

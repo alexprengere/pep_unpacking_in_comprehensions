@@ -161,9 +161,9 @@ Python programmers already use for similar purposes in other contexts.
 Rationale
 ---------
 
-**Why use the ``*`` and ``**`` syntax?** This proposal builds on an
+**Why use the `*` and `**` syntax?** This proposal builds on an
 existing, well-understood concept: the unpacking operator. In Python,
-``*iterable`` is widely recognized as the way to “flatten” an iterable
+``*iterable`` is widely recognized as the way to "flatten" an iterable
 into another iterable context (such as in function calls or literal
 displays), and ``**mapping`` is used to merge mappings. Applying the
 same operators in comprehension output expressions is a consistent
@@ -174,10 +174,10 @@ python.org <https://mail.python.org/archives/list/python-ideas@python.org/messag
 comprehensions - Python-ideas -
 python.org <https://mail.python.org/archives/list/python-ideas@python.org/message/7G732VMDWCRMWM4PKRG6ZMUKH7SUC7SH/#:~:text=propose%20,attempt%20to%20argue%20that%20the>`__).
 A comprehension with ``*expr`` for a sequence effectively means “extend
-the result with the items from ``expr`` on each iteration,” which
+the result with the items from ``expr`` on each iteration," which
 parallels how ``[*a, *b]`` extends a list with items from ``a`` and
 ``b``. Likewise, ``{**m for m in mappings}`` would mean “update the
-result dict with all items from ``m`` on each iteration,” analogous to
+result dict with all items from ``m`` on each iteration," analogous to
 ``{**m1, **m2}`` merging two dicts.
 
 **Readability and familiarity:** When this idea was first floated years
@@ -236,7 +236,7 @@ delaying the rest of that PEP's features (`PEP 448 – Additional
 Unpacking Generalizations \|
 peps.python.org <https://peps.python.org/pep-0448/#variations#:~:text=>`__).
 The deferred feature was noted as something that “has not been ruled out
-for future proposals” (`PEP 448 – Additional Unpacking Generalizations
+for future proposals" (`PEP 448 – Additional Unpacking Generalizations
 \|
 peps.python.org <https://peps.python.org/pep-0448/#variations#:~:text=>`__).
 Now, a decade later, the landscape is favorable for reconsidering it:
@@ -398,7 +398,7 @@ short-circuiting on exceptions, etc.) remains unchanged.
 
 No existing APIs or semantics are altered by this proposal aside from
 the syntax. The ``SyntaxError`` message “iterable unpacking cannot be
-used in comprehension” will no longer be emitted in the situations that
+used in comprehension" will no longer be emitted in the situations that
 become valid. There is an extremely low risk of any code depending on
 that specific error. In summary, if code doesn't use the new syntax, it
 behaves exactly as before.
@@ -445,7 +445,7 @@ approaches and ideas have been considered:
    automatically, or a special keyword. This was generally not favored
    because it would conflict with the current meaning (that would
    normally produce a list of tuple pairs, not flatten them). The
-   unpacking operator is the established way to denote “flattening” in
+   unpacking operator is the established way to denote “flattening" in
    Python. Another idea mentioned in some threads was changing
    ``list.append`` to accept multiple arguments (so that a comprehension
    could conceptually append multiple items). This was quickly dismissed
@@ -458,7 +458,7 @@ approaches and ideas have been considered:
 -  **Do nothing (deferring indefinitely)**: The option remains to simply
    not introduce this feature, as was the case historically. The
    arguments for doing nothing revolve around keeping the language
-   simpler and avoiding a feature that might be seen as “nice to have”
+   simpler and avoiding a feature that might be seen as “nice to have"
    but not necessary. However, given the frequency with which this idea
    has surfaced in discussions over the years and the number of real
    examples where it can be applied, doing nothing means continuing to
@@ -491,7 +491,7 @@ References
    comprehensions as a potential future extension that was postponed due
    to readability concerns.
 
--  Erik Demaine, *“Unpacking in tuple/list/set/dict comprehensions”* –
+-  Erik Demaine, *“Unpacking in tuple/list/set/dict comprehensions"* –
    Python-ideas mailing list discussion (Oct 2021) (`Mailman 3
    [Python-ideas] Unpacking in tuple/list/set/dict comprehensions -
    Python-ideas -
@@ -504,6 +504,6 @@ References
    thread.
 
 -  Python Discuss thread *“Using unpacking to generalize comprehensions
-   with multiple elements”* (Alex Prengère, Oct 2023) – Initial
+   with multiple elements"* (Alex Prengère, Oct 2023) – Initial
    discussion and examples that inspired this PEP, including the
    ``flights`` example and recognition of the historical context.

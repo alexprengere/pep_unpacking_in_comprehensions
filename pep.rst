@@ -214,7 +214,7 @@ The above loop is precisely what
 ``[* (f.departure, f.arrival) for f in flights]`` would do. Similarly, a
 dict comprehension with ``**`` would ``update`` the result dict in each
 iteration. This change is minimal and keeps a clear conceptual model:
-*use ``append`` for single items, use ``extend/update`` for starred
+*use append for single items, use extend/update for starred
 items*. This is analogous to how one might teach the difference between
 ``list.append(x)`` vs ``list.extend([...])`` – the comprehension is just
 doing it implicitly. Some have argued that this slightly complicates the
